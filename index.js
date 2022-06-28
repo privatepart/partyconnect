@@ -2,15 +2,17 @@ const fetch = require('cross-fetch')
 const sigUtil = require('@metamask/eth-sig-util')
 class Privateparty {
   constructor(o) {
+    this.host = (o && o.host ? o.host : "")
     if (o && o.key) {
       this.key = o.key
     }
-    this.host = (o.host ? o.host : location.host)
     this.web3 = o.web3
   }
   async party(name) {
     if (!this.parties) {
-      let r = await fetch("/privateparty").then(r => r.json())
+      let r = await fetch(this.host + "/privateparty", {
+        credentials: (this.host === "" ? "same-origin" : "include"),
+      }).then(r => r.json())
       this.parties = r.parties
       this.csrfToken = r.csrfToken
     }
@@ -27,7 +29,9 @@ class Privateparty {
   // Get current session info
   async session(name) {
     let url = await this.path(name, "session")
-    let r = await fetch(url).then((r) => {
+    let r = await fetch(this.host + url, {
+      credentials: (this.host === "" ? "same-origin" : "include"),
+    }).then((r) => {
       return r.json()
     })
     return r[name]
@@ -71,11 +75,12 @@ class Privateparty {
   async connect(name, payload) {
     const account = await this.account()
     const now = Date.now()
-    const str = `${this.host} authenticating ${account} at ${now} with nonce ${this.csrfToken}`
-    let sig = await this.sign(str)
     let url = await this.path(name, "connect")
-    let r = await fetch(url, {
+    const str = `authenticating ${account} at ${now} with nonce ${this.csrfToken}`
+    let sig = await this.sign(str)
+    let r = await fetch(this.host + url, {
       method: "POST",
+      credentials: (this.host === "" ? "same-origin" : "include"),
       headers: {
         "Content-Type": "application/json",
         'CSRF-Token': this.csrfToken,
@@ -101,16 +106,20 @@ class Privateparty {
   // Delete session
   async disconnect(name) {
     let url = await this.path(name, "disconnect")
-    let r = await fetch(url, {
+    let r = await fetch(this.host + url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      credentials: (this.host === "" ? "same-origin" : "include"),
+      headers: {
+        "Content-Type": "application/json",
+        'CSRF-Token': this.csrfToken,
+      },
       body: JSON.stringify({ name })
     }).then((res) => {
       return res.json()
     })
     this.parties = null   // clear parties so it will refetch parties and csrfToken next time
     this.csrfToken = null
-    return r
+    return null
   }
 }
 module.exports = Privateparty

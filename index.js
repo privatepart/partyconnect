@@ -1,23 +1,20 @@
-const sigUtil = require('@metamask/eth-sig-util')
 const Web3Modal = require("web3modal");
 const WalletConnectProvider = require("@walletconnect/web3-provider");
 const Web3 = require('web3')
 class Privateparty {
   constructor(o) {
     this.host = (o && o.host ? o.host : "")
-    if (o && o.key) {
-      this.key = o.key
-    }
     if (o && o.walletconnect) {
-      this.walletconnect = o.walletconnect
+      this.walletconnect = o.walletconnect  // infuraId
     }
   }
   async init() {
     if (this.walletconnect) {
+      // Walletconnect support if "walletconnect" is specified
       const web3Modal = new Web3Modal.default({
         providerOptions: {
           walletconnect: {
-            display: { name: "Mobile" },
+            display: { name: "Mobile or desktop wallet" },
             package: WalletConnectProvider.default,
             options: {
               infuraId: this.walletconnect
@@ -34,8 +31,9 @@ class Privateparty {
         })
       }
       let accounts = await this.provider.enable()
-      this._account = accounts[0]
+      this.account = accounts[0]
     } else {
+      // Default browser injected wallet
       this.provider = window.ethereum
       if (this.provider.isMetaMask) {
         await this.provider.request({
@@ -44,7 +42,7 @@ class Privateparty {
         })
       }
       let accounts = await this.provider.request({ method: 'eth_requestAccounts' })
-      this._account = accounts[0]
+      this.account = accounts[0]
     }
     this.web3 = new Web3(this.provider)
   }
@@ -76,66 +74,19 @@ class Privateparty {
     })
     return r[name]
   }
-  account () {
-    // if a private key is specified, use that to derive the account
-    if (this.key) {
-      return this.web3.eth.accounts.privateKeyToAccount("0x" + this.key).address
-    }
-    // otherwise, make an RPC request to get the account
-    else {
-      return this._account;
-    }
-  }
   async sign(str) {
-    // if a private key is specified, use that to sign the message
-    if (this.key) {
-      let result = sigUtil.personalSign({
-        data: Buffer.from(str),
-        privateKey: Buffer.from(this.key, "hex")
-      })
-      return result
-    } 
-    // otherwise, sign using RPC
-    else {
-      let result = await this.provider.request({
-        method: "personal_sign",
-        params: [ this.web3.utils.fromUtf8(str), this.account() ]
-      })
-      //let { result } = await new Promise((resolve, reject) => {
-      //  this.web3.eth.personal.sign(
-      //    this.web3.utils.fromUtf8(str),
-      //    this.account(),
-      //    (err, r) => {
-      //      if (err) reject(err)
-      //      else resolve(r)
-      //    }
-      //  )
-      //})
-      //let result = await this.web3.eth.personal.sign(
-      //  this.web3.utils.fromUtf8(str),
-      //  this.account(),
-      //)
-      //let { result } = await new Promise((resolve, reject) => {
-      //  this.web3.currentProvider.sendAsync({
-      //    method: "personal_sign",
-      //    params: [ this.web3.utils.fromUtf8(str), this.account() ]
-      //  }, (err, r) => {
-      //    if (err) reject(err)
-      //    else resolve(r)
-      //  })
-      //})
-
-      //let result = await this.web3.eth.personal.sign(this.web3.utils.fromUtf8(str), this.account()).catch((e) => { console.log("##", e) })
-      //console.log("result", result)
-      return result
-    }
+    let result = await this.provider.request({
+      method: "personal_sign",
+      params: [ this.web3.utils.fromUtf8(str), this.account ]
+    })
+    return result
   }
   // Connect and session
   async connect(name, payload) {
     await this.init()
     const now = Date.now()
     let url = await this.path(name, "connect")
-    const str = `authenticating ${this.account()} at ${now} with nonce ${this.csrfToken}`
+    const str = `authenticating ${this.account} at ${now} with nonce ${this.csrfToken}`
     let sig = await this.sign(str)
     let r = await fetch(this.host + url, {
       method: "POST",
@@ -185,6 +136,8 @@ class Privateparty {
       localStorage.removeItem("walletconnect")
     }
     this.provider = null;
+    this.account = null;
+    this.web3 = null;
     return null
   }
 }

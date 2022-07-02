@@ -12,17 +12,17 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
   ],
+//  plugins: [
+//    new webpack.DefinePlugin({ 'process.env.NODE_DEBUG': false })
+//  ],
   resolve: {
     extensions: [ '.ts', '.js' ],
     fallback: {
       "http": require.resolve("stream-http"),
       "https": require.resolve("https-browserify"),
       "crypto": require.resolve("crypto-browserify"),
-//      "assert": require.resolve("assert/"),
-//      "url": require.resolve("url/"),
       "os": require.resolve("os-browserify/browser"),
       "stream": require.resolve("stream-browserify"),
-//      "buffer": require.resolve("buffer")
     }
   },
 };

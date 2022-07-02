@@ -18,11 +18,11 @@ module.exports = {
       "http": require.resolve("stream-http"),
       "https": require.resolve("https-browserify"),
       "crypto": require.resolve("crypto-browserify"),
-      "assert": require.resolve("assert/"),
-      "url": require.resolve("url/"),
+//      "assert": require.resolve("assert/"),
+//      "url": require.resolve("url/"),
       "os": require.resolve("os-browserify/browser"),
       "stream": require.resolve("stream-browserify"),
-      "buffer": require.resolve("buffer")
+//      "buffer": require.resolve("buffer")
     }
   },
 };

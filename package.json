@@ -1,6 +1,6 @@
 {
   "name": "privatepartyjs",
-  "version": "0.0.29",
+  "version": "0.0.31",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "@metamask/eth-sig-util": "^4.0.1",
-    "cross-fetch": "^3.1.5"
+    "@walletconnect/web3-provider": "^1.7.8",
+    "web3": "^1.7.4",
+    "web3modal": "^1.9.8"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "privatepartyjs",
-  "version": "0.0.32",
+  "version": "0.0.37",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,7 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@walletconnect/web3-provider": "^1.7.8",
-    "web3": "^1.7.4",
-    "web3modal": "^1.9.8"
+    "superprovider": "^0.0.14",
+    "web3": "^1.7.4"
   }
 }

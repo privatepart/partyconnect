@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
   entry: "./index.js",
   mode: 'production',
@@ -24,5 +25,17 @@ module.exports = {
       "os": require.resolve("os-browserify/browser"),
       "stream": require.resolve("stream-browserify"),
     }
+  },
+  optimization: {
+    minimizer: [
+      (compiler) => {
+        const TerserPlugin = require('terser-webpack-plugin');
+        new TerserPlugin({
+          terserOptions: {
+            compress: {},
+          }
+        }).apply(compiler);
+      },
+    ]
   },
 };

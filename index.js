@@ -41,8 +41,8 @@ class Privateparty {
     return result
   }
   // Connect and session
-  async connect(name, payload) {
-    let provider = await this.superprovider.connect()  
+  async connect(name, payload, options) {
+    let provider = await this.superprovider.connect((options && options.fresh ? true : false))
     this.provider = provider
     this.account = this.superprovider.account
     this.web3 = new Web3(provider)

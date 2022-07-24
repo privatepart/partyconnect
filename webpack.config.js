@@ -4,7 +4,7 @@ module.exports = {
   entry: "./index.js",
   mode: 'production',
   output: {
-    filename: 'privateparty.js',
+    filename: 'partyconnect.js',
     library: 'Privateparty',
   },
   plugins: [

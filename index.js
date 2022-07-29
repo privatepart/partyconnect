@@ -33,6 +33,10 @@ class Privateparty {
     })
     return r[name]
   }
+  async gate(name) {
+    let url = await this.path(name, "gate")
+    return url
+  }
   async sign(str) {
     let result = await this.provider.request({
       method: "personal_sign",
